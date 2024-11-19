@@ -2,7 +2,7 @@
     <lightning-card variant="Narrow" title="IT Request Calendar">
         <div class="slds-grid slds-wrap slds-m-around_small">
             <!-- Calendar Section -->
-            <div class={calendarClass} style={calendarStyle}>
+            <div class="slds-col slds-size_10-of-12" style="width: 85%;">
                 <div id="calendar" class="fullcalendarjs"></div>
             </div>
 
@@ -10,7 +10,6 @@
             <div class="slds-col slds-size_2-of-12" style="width: 15%;">
                 <div class="slds-p-around_small">
                     <lightning-record-picker
-                        key={individualPickerKey}
                         label="Individual Requested"
                         placeholder="Search Individuals..."
                         object-api-name="Contact"
