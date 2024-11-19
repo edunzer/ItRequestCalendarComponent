@@ -5,7 +5,7 @@ public with sharing class ItRequestCalendarService {
             String query = 'SELECT Id, Name, Linked_IT_Request__r.Name, Supplier_Assignment__r.Name, ' +
                            'Contact__r.Name, Start_Date__c, Linked_IT_Request_Date__c, Agency__c, Type__c, ' +
                            'Supplier_Assignment__r.Project_Code__c ' +
-                           'FROM IT_Request__c WHERE Status__c != \'Cancelled\' AND Start_Date__c != null ';
+                           'FROM IT_Request__c WHERE Status__c != \'Cancelled\' AND Start_Date__c != null AND Type__c = \'External\' ';
             
             if (String.isNotBlank(individualRequested)) {
                 query += ' AND Contact__r.Name LIKE \'%' + String.escapeSingleQuotes(individualRequested) + '%\'';
@@ -26,21 +26,25 @@ public with sharing class ItRequestCalendarService {
     }
 
     @AuraEnabled(cacheable=true)
-    public static List<SelectOption> getPicklistValues(String objectName, String fieldName) {
+    public static List<String> getPicklistValues(String objectName, String fieldName) {
         try {
-            Schema.DescribeFieldResult fieldResult = Schema.getGlobalDescribe().get(objectName)
-                                                            .getDescribe()
-                                                            .fields.getMap()
-                                                            .get(fieldName)
-                                                            .getDescribe();
+            Schema.SObjectType sObjectType = Schema.getGlobalDescribe().get(objectName);
+            Schema.DescribeSObjectResult describeSObjectResult = sObjectType.getDescribe();
+            Map<String, Schema.SObjectField> fields = describeSObjectResult.fields.getMap();
+            Schema.DescribeFieldResult fieldResult = fields.get(fieldName).getDescribe();
             List<Schema.PicklistEntry> picklistEntries = fieldResult.getPicklistValues();
-            List<SelectOption> options = new List<SelectOption>();
+
+            List<String> picklistValues = new List<String>();
             for (Schema.PicklistEntry entry : picklistEntries) {
-                options.add(new SelectOption(entry.getValue(), entry.getLabel()));
+                if (entry.isActive()) {
+                    picklistValues.add(entry.getValue());
+                }
             }
-            return options;
+
+            return picklistValues;
         } catch (Exception e) {
-            throw new AuraHandledException('Error fetching picklist values: ' + e.getMessage());
+            throw new AuraHandledException('Unable to fetch picklist values. Please contact admin.');
         }
     }
+
 }
