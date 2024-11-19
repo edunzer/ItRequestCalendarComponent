@@ -1,0 +1,80 @@
+<template>
+    <lightning-card variant="Narrow" title="IT Request Calendar">
+        <div class="slds-grid slds-wrap slds-m-around_small">
+            <!-- Calendar Section -->
+            <div class={calendarClass} style={calendarStyle}>
+                <div id="calendar" class="fullcalendarjs"></div>
+            </div>
+
+            <!-- Filters Section -->
+            <div class="slds-col slds-size_2-of-12" style="width: 15%;">
+                <div class="slds-p-around_small">
+                    <lightning-record-picker
+                        key={individualPickerKey}
+                        label="Individual Requested"
+                        placeholder="Search Individuals..."
+                        object-api-name="Contact"
+                        onchange={handleIndividualChange}>
+                    </lightning-record-picker>
+
+                    <lightning-combobox
+                        data-id="agencyComboBox"
+                        label="Agency"
+                        placeholder="Select Agency"
+                        options={agencyOptions}
+                        onchange={handleAgencyChange}>
+                    </lightning-combobox>
+
+                    <lightning-input
+                        data-id="projectCodeInput"
+                        label="Project Code"
+                        placeholder="Enter Project Code"
+                        onchange={handleProjectCodeChange}>
+                    </lightning-input>
+
+                    <div class="slds-m-top_medium">
+                        <lightning-button-group>
+                            <lightning-button
+                                label="Apply"
+                                variant="brand"
+                                onclick={applyFilters}>
+                            </lightning-button>
+                            <lightning-button
+                                label="Clear"
+                                variant="neutral"
+                                onclick={clearFilters}>
+                            </lightning-button>
+                        </lightning-button-group>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Event Details Modal -->
+        <template if:true={selectedEvent}>
+            <section role="dialog" tabindex="-1" class="slds-modal slds-fade-in-open slds-modal_small"
+                     aria-labelledby="modal-heading-01" aria-modal="true" aria-describedby="modal-content-id-1">
+                <div class="slds-modal__container">
+                    <header class="slds-modal__header">
+                        <h2 id="modal-heading-01" class="slds-modal__title slds-hyphenate">Event Details</h2>
+                    </header>
+                    <div class="slds-modal__content slds-p-around_medium" id="modal-content-id-1">
+                        <lightning-card variant="Narrow" title={selectedEvent.title} icon-name="standard:event">
+                            <p class="slds-p-horizontal_small">Supplier Assignment: {selectedEvent.supplierAssignmentName}</p>
+                            <p class="slds-p-horizontal_small">Project Code: {selectedEvent.projectCode}</p>
+                            <p class="slds-p-horizontal_small">Agency: {selectedEvent.agency}</p>
+                            <p class="slds-p-horizontal_small">Start Date: <lightning-formatted-date-time 
+                                value={selectedEvent.start} year="numeric" month="long" day="2-digit"></lightning-formatted-date-time></p>
+                            <p class="slds-p-horizontal_small">End Date: <lightning-formatted-date-time 
+                                value={selectedEvent.end} year="numeric" month="long" day="2-digit"></lightning-formatted-date-time></p>
+                        </lightning-card>
+                    </div>
+                    <footer class="slds-modal__footer">
+                        <button class="slds-button slds-button_brand" onclick={closeModal}>Close</button>
+                    </footer>
+                </div>
+            </section>
+            <div class="slds-backdrop slds-backdrop_open"></div>
+        </template>
+    </lightning-card>
+</template>
